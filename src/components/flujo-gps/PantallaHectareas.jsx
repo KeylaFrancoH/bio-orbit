@@ -6,7 +6,13 @@ const MAXIMO = 100000
 
 const leer = (texto) => parseFloat(String(texto).replace(',', '.'))
 
-export default function PantallaHectareas({ valorInicial, onGuardar, onVolver }) {
+export default function PantallaHectareas({
+  valorInicial,
+  onGuardar,
+  onVolver,
+  titulo = '¿Cuántas hectáreas tiene tu finca?',
+  subtitulo = 'Usaremos este dato para delimitar tu parcela en el mapa.',
+}) {
   const [texto, setTexto] = useState(valorInicial ? String(valorInicial) : '')
   const [error, setError] = useState('')
   const valor = leer(texto)
@@ -47,9 +53,9 @@ export default function PantallaHectareas({ valorInicial, onGuardar, onVolver })
           <LandPlot size={44} strokeWidth={1.75} />
         </div>
         <label htmlFor="fg-hectareas" className="onb-titulo fg-titulo-largo">
-          ¿Cuántas hectáreas tiene tu finca?
+          {titulo}
         </label>
-        <p className="onb-subtitulo">Usaremos este dato para delimitar tu parcela en el mapa.</p>
+        <p className="onb-subtitulo">{subtitulo}</p>
 
         <div className={`fg-campo-ha ${error ? 'invalido' : ''}`}>
           <button type="button" className="fg-paso-btn" onClick={() => ajustar(-1)} aria-label="Restar una hectárea">

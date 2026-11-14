@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, useMap } from 'react-leaflet'
-import { Check, ChevronLeft, LoaderCircle, Move, TriangleAlert } from 'lucide-react'
+import { Check, ChevronLeft, LoaderCircle, Move, Plus, TriangleAlert } from 'lucide-react'
 import L from '../../lib/leaflet.js'
-import { TILE_SATELITE, areaHa, centroide, cuadradoPorArea, formatoNumero, perimetroM } from './geo.js'
+import { TILE_SATELITE, areaHa, centroAlLado, centroide, cuadradoPorArea, formatoNumero, perimetroM } from './geo.js'
 import { detectarParcela } from './deteccion.js'
 
 const ESPERA_TRAS_SOLTAR = 450 // ms antes de ajustar automáticamente al soltar
@@ -114,9 +114,19 @@ function CuadroArrastrable({ puntos, apagado, onEmpezar, onMover, onSoltar }) {
   )
 }
 
-export default function PantallaUbicarParcela({ ubicacion, hectareas, onAceptar, onVolver }) {
-  const inicial = useMemo(() => cuadradoPorArea(ubicacion, hectareas), [ubicacion, hectareas])
-  const limites = useMemo(() => L.latLngBounds(inicial).pad(0.9), [inicial])
+const SIN_PARCELAS = []
+
+// `otrasParcelas`: polígonos ya guardados de la finca. Se muestran como
+// referencia y el cuadro nuevo aparece a su lado.
+export default function PantallaUbicarParcela({ ubicacion, hectareas, otrasParcelas = SIN_PARCELAS, onAceptar, onVolver }) {
+  const inicial = useMemo(
+    () => cuadradoPorArea(otrasParcelas.length ? centroAlLado(otrasParcelas, hectareas) : ubicacion, hectareas),
+    [ubicacion, hectareas, otrasParcelas],
+  )
+  const limites = useMemo(
+    () => L.latLngBounds([...inicial, ...otrasParcelas.flat()]).pad(otrasParcelas.length ? 0.12 : 0.9),
+    [inicial, otrasParcelas],
+  )
   const [cuadro, setCuadro] = useState(inicial)
   const [estado, setEstado] = useState('ubicando') // ubicando | ajustando | listo
   const [deteccion, setDeteccion] = useState(null)
@@ -163,10 +173,10 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, onAceptar,
     setEstado('ubicando')
   }
 
-  const aceptar = () => {
+  const aceptar = (opciones) => {
     const automatico = !!deteccion?.ok
     const poligono = automatico ? deteccion.poligono : cuadro
-    onAceptar({ poligono, area: areaHa(poligono), perimetro: perimetroM(poligono), automatico })
+    onAceptar({ poligono, area: areaHa(poligono), perimetro: perimetroM(poligono), automatico }, opciones)
   }
 
   const detectado = estado === 'listo' && deteccion?.ok
@@ -185,6 +195,14 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, onAceptar,
         <MapContainer bounds={limites} className="map" zoomControl={false} doubleClickZoom={false}>
           <TileLayer url={TILE_SATELITE.url} attribution={TILE_SATELITE.attribution} maxZoom={19} />
           <Marker position={[ubicacion.lat, ubicacion.lng]} icon={ICONO_GPS} interactive={false} />
+          {otrasParcelas.map((poligono, i) => (
+            <Polygon
+              key={`otra-${i}`}
+              positions={poligono}
+              interactive={false}
+              pathOptions={{ color: '#ffffff', weight: 2, fillColor: '#047857', fillOpacity: 0.45 }}
+            />
+          ))}
           <CuadroArrastrable
             puntos={cuadro}
             apagado={detectado}
@@ -238,7 +256,7 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, onAceptar,
               <div>
                 <h1 className="fg-hoja-titulo">Pon el cuadro sobre tu parcela</h1>
                 <p className="fg-hoja-texto">
-                  Arrástralo con el dedo. Mide {formatoNumero(hectareas)} ha, como tu finca.
+                  Arrástralo con el dedo. Mide {formatoNumero(hectareas)} ha, como tu {otrasParcelas.length ? 'parcela' : 'finca'}.
                 </p>
               </div>
             </div>
@@ -276,8 +294,11 @@ export default function PantallaUbicarParcela({ ubicacion, hectareas, onAceptar,
               </div>
             </div>
             <div className="onb-acciones">
-              <button className="onb-btn onb-btn-primario" onClick={aceptar} autoFocus>
+              <button className="onb-btn onb-btn-primario" onClick={() => aceptar()} autoFocus>
                 <Check size={20} /> {detectado ? 'Sí, guardar mi parcela' : 'Guardar así'}
+              </button>
+              <button className="onb-btn onb-btn-secundario" onClick={() => aceptar({ otra: true })}>
+                <Plus size={20} /> Guardar y agregar otra parcela
               </button>
               <button className="fg-btn-texto" onClick={moverOtraVez}>
                 Moverlo otra vez

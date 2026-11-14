@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { MapContainer, Polygon, TileLayer } from 'react-leaflet'
 import {
-  Activity, BarChart3, ChevronRight, House, Layers, LandPlot, Map as MapIcon, MapPin, Ruler, ScanLine, UserRound, Zap,
+  Activity, BarChart3, ChevronRight, House, Layers, LandPlot, Map as MapIcon, MapPin, Plus, Ruler, ScanLine, UserRound, Zap,
 } from 'lucide-react'
 import L from '../../lib/leaflet.js'
 import { TILE_SATELITE, formatoNumero } from './geo.js'
@@ -26,8 +26,12 @@ const NAVEGACION = [
 ]
 
 // Home simulada: resumen de la finca recién registrada.
-export default function PantallaHome({ nombre, ubicacion, parcela, historial, analisis, onProceso, onVerResultados }) {
-  const limites = useMemo(() => L.latLngBounds(parcela.poligono), [parcela])
+export default function PantallaHome({
+  nombre, ubicacion, parcelas, historial, analisis, onProceso, onVerResultados, onAgregarParcela,
+}) {
+  const limites = useMemo(() => L.latLngBounds(parcelas.flatMap((p) => p.poligono)), [parcelas])
+  const areaTotal = parcelas.reduce((s, p) => s + p.area, 0)
+  const varias = parcelas.length > 1
   const primerNombre = nombre.split(' ')[0]
   const porGps = ubicacion.precision != null
 
@@ -47,6 +51,7 @@ export default function PantallaHome({ nombre, ubicacion, parcela, historial, an
         <article className="fg-tarjeta-finca fg-aparecer">
           <div className="fg-mini-mapa">
             <MapContainer
+              key={parcelas.length}
               bounds={limites}
               boundsOptions={{ padding: [20, 20] }}
               className="map"
@@ -59,21 +64,33 @@ export default function PantallaHome({ nombre, ubicacion, parcela, historial, an
               attributionControl={false}
             >
               <TileLayer url={TILE_SATELITE.url} maxZoom={19} />
-              <Polygon
-                positions={parcela.poligono}
-                pathOptions={{ color: '#fff', weight: 2, fillColor: '#10b981', fillOpacity: 0.4 }}
-              />
+              {parcelas.map((p, i) => (
+                <Polygon
+                  key={i}
+                  positions={p.poligono}
+                  pathOptions={{ color: '#fff', weight: 2, fillColor: '#10b981', fillOpacity: 0.4 }}
+                />
+              ))}
             </MapContainer>
             <span className="fg-insignia">
               <ScanLine size={14} /> {porGps ? 'Contorno aproximado' : 'Dibujada por ti'}
             </span>
           </div>
           <div className="fg-tarjeta-finca-info">
-            <h2>Mi finca</h2>
-            <p>
-              <MapPin size={14} />
-              {porGps ? `Ubicada con el GPS del celular (±${Math.round(ubicacion.precision)} m)` : 'Ubicada dibujándola en el mapa'}
-            </p>
+            <div className="fg-tarjeta-finca-texto">
+              <h2>Mi finca</h2>
+              <p>
+                <MapPin size={14} />
+                {varias
+                  ? `${parcelas.length} parcelas · ${formatoNumero(areaTotal, 1)} ha en total`
+                  : porGps
+                    ? `Ubicada con el GPS del celular (±${Math.round(ubicacion.precision)} m)`
+                    : 'Ubicada dibujándola en el mapa'}
+              </p>
+            </div>
+            <button className="fg-btn-anadir" onClick={onAgregarParcela}>
+              <Plus size={18} /> Añadir parcela
+            </button>
           </div>
         </article>
 
@@ -102,13 +119,13 @@ export default function PantallaHome({ nombre, ubicacion, parcela, historial, an
         <div className="fg-stats fg-aparecer" style={{ '--retraso': '0.2s' }}>
           <div className="fg-stat">
             <LandPlot size={18} />
-            <span>Tamaño</span>
-            <strong>{formatoNumero(parcela.area)} ha</strong>
+            <span>{varias ? 'Tamaño total' : 'Tamaño'}</span>
+            <strong>{formatoNumero(areaTotal)} ha</strong>
           </div>
           <div className="fg-stat">
-            <Ruler size={18} />
-            <span>Contorno</span>
-            <strong>{formatoNumero(parcela.perimetro, 0)} m</strong>
+            {varias ? <ScanLine size={18} /> : <Ruler size={18} />}
+            <span>{varias ? 'Parcelas' : 'Contorno'}</span>
+            <strong>{varias ? parcelas.length : `${formatoNumero(parcelas[0].perimetro, 0)} m`}</strong>
           </div>
           <button className="fg-stat ancho fg-stat-boton" onClick={onVerResultados}>
             <Activity size={18} />

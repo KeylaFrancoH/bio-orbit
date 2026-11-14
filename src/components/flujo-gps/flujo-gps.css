@@ -394,7 +394,26 @@
   font-size: 12px;
   font-weight: 600;
 }
-.fg-tarjeta-finca-info { padding: 14px 16px 16px; }
+.fg-tarjeta-finca-info { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
+.fg-tarjeta-finca-texto { flex: 1; min-width: 0; }
+.fg-btn-anadir {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--esmeralda);
+  border-radius: 999px;
+  background: var(--esmeralda-suave);
+  color: var(--esmeralda);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fg-btn-anadir:hover { background: #d1fae5; }
+.fg-btn-anadir:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
 .fg-tarjeta-finca-info h2 { margin: 0 0 4px; font-size: 17px; font-weight: 600; }
 .fg-tarjeta-finca-info p { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--onb-texto-suave); }
 
@@ -504,3 +523,65 @@
 .fg-asa:active { cursor: grabbing; }
 .fg-ubicar.ajustando .fg-asa, .fg-ubicar.listo .fg-asa { opacity: 0.55; }
 .fg-ubicar .fg-cerrar { top: max(14px, env(safe-area-inset-top)); }
+
+/* ---------- Pantallas informativas (avanzan solas) ---------- */
+.fg-informativa { cursor: default; }
+.fg-temporizador {
+  align-self: center;
+  width: 96px;
+  height: 4px;
+  border-radius: 4px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+.fg-temporizador span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 4px;
+  background: var(--esmeralda);
+  transform-origin: left;
+  animation: fg-temporizador linear both;
+}
+@keyframes fg-temporizador { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.fg-ilustra-ubicar {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 132px;
+  height: 132px;
+  margin-bottom: 28px;
+  padding: 6px;
+  border-radius: 24px;
+  background: #6b8f5a;
+  box-shadow: 0 10px 24px rgba(6, 95, 70, 0.18);
+}
+.fg-ilustra-parcela { border-radius: 8px; background: #86a86f; }
+.fg-ilustra-parcela.b { background: #a3b86c; }
+.fg-ilustra-parcela.c { background: #7a9b5f; }
+.fg-ilustra-parcela.d { background: #94b07a; }
+.fg-ilustra-cuadro {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 57px;
+  height: 57px;
+  border: 3px solid #fff;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.45);
+  color: #fff;
+  animation: fg-ilustra-mover 2.4s ease-in-out infinite;
+}
+@keyframes fg-ilustra-mover {
+  0%, 15% { transform: translate(0, 0); }
+  45%, 60% { transform: translate(63px, 0); }
+  85%, 100% { transform: translate(63px, 63px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fg-ilustra-cuadro { animation: none; }
+}

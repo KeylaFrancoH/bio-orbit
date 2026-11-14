@@ -21,6 +21,18 @@ export function cuadradoPorArea(centro, hectareas) {
   ]
 }
 
+// Centro para un cuadro nuevo de `hectareas`, pegado al este de las parcelas
+// que ya existen, para que no aparezca encima de ellas.
+export function centroAlLado(poligonos, hectareas) {
+  const puntos = poligonos.flat()
+  const norte = Math.max(...puntos.map((p) => p[0]))
+  const sur = Math.min(...puntos.map((p) => p[0]))
+  const este = Math.max(...puntos.map((p) => p[1]))
+  const lat = (norte + sur) / 2
+  const medioLng = Math.sqrt(hectareas * 10000) / 2 / (M_POR_GRADO * Math.cos((lat * Math.PI) / 180))
+  return { lat, lng: este + medioLng * 1.15 }
+}
+
 export const centroide = (puntos) => [
   puntos.reduce((s, p) => s + p[0], 0) / puntos.length,
   puntos.reduce((s, p) => s + p[1], 0) / puntos.length,

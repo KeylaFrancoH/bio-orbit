@@ -26,9 +26,9 @@ export default function PasoNombre({ nombre, onNombreChange, onSiguiente }) {
         <div className="onb-avatar" aria-hidden="true">
           <Sprout size={44} strokeWidth={1.75} />
         </div>
-        <p className="onb-saludo">¡Bienvenido a Bio Orbit!</p>
+        <p className="onb-saludo">¡Te damos la bienvenida a Bio Orbit!</p>
         <label htmlFor="onb-nombre" className="onb-titulo">
-          Ingresa tu nombre
+          ¿Cómo te llamas?
         </label>
         <input
           id="onb-nombre"

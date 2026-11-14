@@ -13,9 +13,9 @@ const PAUSA_TRAS_VUELO = 1600
 const PASOS = ['Activando GPS', 'Buscando señal satelital', 'Calculando tu posición']
 
 const MENSAJES_ERROR = {
-  1: 'No tenemos permiso para usar tu ubicación. Actívalo en tu navegador o selecciona manualmente.',
-  2: 'No pudimos determinar tu ubicación. Intenta de nuevo o selecciona manualmente.',
-  3: 'La búsqueda tardó demasiado. Intenta de nuevo o selecciona manualmente.',
+  1: 'El celular no nos dio permiso para usar tu ubicación. Actívalo o dibuja tu finca en el mapa.',
+  2: 'No encontramos señal GPS. Sal a un lugar abierto e intenta de nuevo, o dibuja tu finca en el mapa.',
+  3: 'La búsqueda tardó demasiado. Intenta de nuevo o dibuja tu finca en el mapa.',
 }
 
 const ICONO_GPS = L.divIcon({
@@ -62,7 +62,7 @@ function CirculoPrecision({ centro, radioFinal }) {
 }
 
 const SIN_GPS = typeof navigator === 'undefined' || !('geolocation' in navigator)
-const MENSAJE_SIN_GPS = 'Tu dispositivo no permite obtener la ubicación. Selecciona manualmente.'
+const MENSAJE_SIN_GPS = 'Tu dispositivo no tiene GPS disponible. Dibuja tu finca en el mapa.'
 
 export default function PantallaLocalizando({ onUbicada, onCancelar, onManual }) {
   const [estado, setEstado] = useState(SIN_GPS ? 'error' : 'buscando') // buscando | fijada | error
@@ -205,7 +205,7 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
                 <RefreshCw size={18} /> Reintentar
               </button>
               <button className="onb-btn onb-btn-secundario" onClick={onManual}>
-                Seleccionar manualmente
+                Dibujar en el mapa
               </button>
             </div>
           </>
@@ -220,7 +220,7 @@ export default function PantallaLocalizando({ onUbicada, onCancelar, onManual })
                   {estado === 'buscando' ? 'Detectando tu ubicación…' : 'Ubicación detectada'}
                 </h1>
                 <p className="fg-hoja-texto">
-                  {estado === 'buscando' ? 'Mantén tu dispositivo quieto un momento.' : 'Acercando el mapa a tu finca…'}
+                  {estado === 'buscando' ? 'Quédate quieto un momento, mejor al aire libre.' : 'Acercando el mapa a tu finca…'}
                 </p>
               </div>
             </div>

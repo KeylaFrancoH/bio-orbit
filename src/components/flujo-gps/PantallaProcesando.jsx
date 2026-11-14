@@ -60,12 +60,14 @@ export default function PantallaProcesando({ ubicacion, hectareas, onTerminado, 
   }, [fase, aproximado, final])
 
   const terminado = fase >= DURACIONES.length
+  // El contorno se genera a partir de la ubicación y las hectáreas declaradas
+  // (todavía no se detectan bordes reales), así que los textos lo dicen así.
   const pasos = [
-    'Recibiendo coordenadas GPS',
-    'Analizando imagen satelital',
-    'Detectando bordes de la parcela',
-    `Ajustando polígono a ${formatoNumero(hectareas)} ha`,
-    'Validando límites del terreno',
+    'Recibiendo tu ubicación',
+    'Cargando la imagen satelital',
+    'Buscando tu terreno en la imagen',
+    `Dibujando un contorno de ${formatoNumero(hectareas)} ha`,
+    'Revisando el resultado',
   ]
   const progreso = Math.round((Math.min(fase, DURACIONES.length) / DURACIONES.length) * 100)
 
@@ -124,7 +126,7 @@ export default function PantallaProcesando({ ubicacion, hectareas, onTerminado, 
         {(fase === 1 || fase === 2) && <div className="fg-escaneo" aria-hidden="true" />}
         <div className={`fg-chip-gps ${terminado ? 'fijada' : 'buscando'}`}>
           <span className="fg-chip-punto" />
-          {terminado ? 'Parcela delimitada' : 'Procesando imagen satelital'}
+          {terminado ? 'Contorno listo' : 'Ubicando tu parcela'}
         </div>
       </div>
 
@@ -134,11 +136,11 @@ export default function PantallaProcesando({ ubicacion, hectareas, onTerminado, 
             {terminado ? <Check size={22} /> : <ScanLine size={22} />}
           </span>
           <div>
-            <h1 className="fg-hoja-titulo">{terminado ? '¡Parcela delimitada!' : 'Delimitando tu parcela…'}</h1>
+            <h1 className="fg-hoja-titulo">{terminado ? '¡Listo, ubicamos tu parcela!' : 'Ubicando tu parcela…'}</h1>
             <p className="fg-hoja-texto">
               {terminado
-                ? 'Calculamos el tamaño y los límites de tu terreno.'
-                : 'Estamos ubicando los bordes de tu terreno en la imagen satelital.'}
+                ? `Dibujamos un contorno aproximado de ${formatoNumero(hectareas)} ha alrededor de donde estás.`
+                : 'Estamos buscando tu terreno en la imagen satelital.'}
             </p>
           </div>
         </div>
@@ -147,15 +149,15 @@ export default function PantallaProcesando({ ubicacion, hectareas, onTerminado, 
           <>
             <div className="fg-lectura fg-resultado">
               <div>
-                <span>Área</span>
+                <span>Tamaño</span>
                 <strong>{formatoNumero(resultado.area)} ha</strong>
               </div>
               <div>
-                <span>Perímetro</span>
+                <span>Contorno</span>
                 <strong>{formatoNumero(resultado.perimetro, 0)} m</strong>
               </div>
               <div>
-                <span>Vértices</span>
+                <span>Esquinas</span>
                 <strong>{final.length}</strong>
               </div>
             </div>

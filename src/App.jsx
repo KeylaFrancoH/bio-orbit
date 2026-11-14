@@ -8,7 +8,6 @@ export default function App() {
   const [sesion, setSesion] = useState(null)
   const [ultimoNombre, setUltimoNombre] = useState('')
   const [historial, setHistorial] = useState([])
-  const [figuras, setFiguras] = useState(0)
 
   const registrar = useCallback((tipo, detalle) => {
     setHistorial((prev) => [
@@ -24,18 +23,18 @@ export default function App() {
 
   const onSelectManually = ({ nombre }) => {
     setSesion({ nombre, ubicacion: null, modo: 'manual' })
-    registrar('Ubicación', 'Selección manual en el mapa')
+  }
+
+  // El modo manual termina cuando el agricultor guarda el dibujo de su finca:
+  // desde ahí sigue el mismo camino que el GPS (inicio → resultados).
+  const onParcelaLista = ({ ubicacion, parcela }) => {
+    setSesion((s) => ({ ...s, modo: 'finca', ubicacion, parcela }))
   }
 
   // Vuelve al paso "Ubica tu finca" conservando el nombre
   const volverAlOnboarding = () => {
     setUltimoNombre(sesion.nombre)
-    setFiguras(0)
     setSesion(null)
-  }
-
-  const ejecutarProceso = (modo, detalle) => {
-    registrar(modo, detalle ?? (figuras ? `${figuras} área(s) seleccionada(s)` : 'Sin áreas dibujadas'))
   }
 
   if (!sesion) {
@@ -49,27 +48,28 @@ export default function App() {
     )
   }
 
-  if (sesion.modo === 'gps') {
+  if (sesion.modo === 'manual') {
     return (
-      <FlujoGps
-        nombre={sesion.nombre}
-        historial={historial}
+      <VistaMapaMovil
+        sesion={sesion}
+        onVolver={volverAlOnboarding}
         onEvento={registrar}
-        onProceso={ejecutarProceso}
-        onCancelar={volverAlOnboarding}
-        onManual={() => onSelectManually({ nombre: sesion.nombre })}
+        onParcelaLista={onParcelaLista}
       />
     )
   }
 
+  // 'gps' empieza localizando; 'finca' (dibujada a mano) empieza en el inicio.
   return (
-    <VistaMapaMovil
-      sesion={sesion}
+    <FlujoGps
+      nombre={sesion.nombre}
       historial={historial}
-      onProceso={ejecutarProceso}
-      onVolver={volverAlOnboarding}
-      onFigurasChange={setFiguras}
+      ubicacionInicial={sesion.ubicacion}
+      parcelaInicial={sesion.parcela}
       onEvento={registrar}
+      onProceso={registrar}
+      onCancelar={volverAlOnboarding}
+      onManual={() => onSelectManually({ nombre: sesion.nombre })}
     />
   )
 }

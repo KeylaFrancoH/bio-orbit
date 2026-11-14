@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import { MapContainer, Polygon, TileLayer } from 'react-leaflet'
 import {
-  Activity, BarChart3, House, Layers, LandPlot, Map as MapIcon, MapPin, Ruler, ScanLine, UserRound, Zap,
+  Activity, BarChart3, ChevronRight, House, Layers, LandPlot, Map as MapIcon, MapPin, Ruler, ScanLine, UserRound, Zap,
 } from 'lucide-react'
 import L from '../../lib/leaflet.js'
-import { TILE_SATELITE, formatoCoord, formatoNumero } from './geo.js'
+import { TILE_SATELITE, formatoNumero } from './geo.js'
+import { ESTADOS, MENSAJE_ESTADO } from '../resultados/analisis.js'
 
 const ICONOS = { Rápido: Zap, Profundo: Layers, Ubicación: MapPin, Superficie: Ruler, Parcela: ScanLine }
 
@@ -15,17 +16,20 @@ const saludo = () => {
 
 const hora = (fecha) => fecha.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
 
+// `listo: false` = pantalla aún no construida: se muestra apagada para no
+// dejar al agricultor tocando un botón que no hace nada.
 const NAVEGACION = [
-  { nombre: 'Inicio', Icono: House },
-  { nombre: 'Mapa', Icono: MapIcon },
-  { nombre: 'Análisis', Icono: BarChart3 },
-  { nombre: 'Perfil', Icono: UserRound },
+  { nombre: 'Inicio', Icono: House, listo: true },
+  { nombre: 'Mapa', Icono: MapIcon, listo: false },
+  { nombre: 'Análisis', Icono: BarChart3, listo: true },
+  { nombre: 'Perfil', Icono: UserRound, listo: false },
 ]
 
 // Home simulada: resumen de la finca recién registrada.
-export default function PantallaHome({ nombre, ubicacion, parcela, historial, onProceso }) {
+export default function PantallaHome({ nombre, ubicacion, parcela, historial, analisis, onProceso, onVerResultados }) {
   const limites = useMemo(() => L.latLngBounds(parcela.poligono), [parcela])
   const primerNombre = nombre.split(' ')[0]
+  const porGps = ubicacion.precision != null
 
   return (
     <div className="fg-pantalla fg-home">
@@ -61,46 +65,70 @@ export default function PantallaHome({ nombre, ubicacion, parcela, historial, on
               />
             </MapContainer>
             <span className="fg-insignia">
-              <ScanLine size={14} /> Parcela delimitada
+              <ScanLine size={14} /> {porGps ? 'Contorno aproximado' : 'Dibujada por ti'}
             </span>
           </div>
           <div className="fg-tarjeta-finca-info">
             <h2>Mi finca</h2>
             <p>
-              <MapPin size={14} /> {formatoCoord(ubicacion.lat)}, {formatoCoord(ubicacion.lng)}
+              <MapPin size={14} />
+              {porGps ? `Ubicada con el GPS del celular (±${Math.round(ubicacion.precision)} m)` : 'Ubicada dibujándola en el mapa'}
             </p>
           </div>
         </article>
 
-        <div className="fg-stats fg-aparecer" style={{ '--retraso': '0.1s' }}>
+        <section className="fg-aparecer" style={{ '--retraso': '0.1s' }}>
+          <h2 className="fg-seccion-titulo">Analiza tu finca</h2>
+          <div className="fg-analisis">
+            <button className="fg-analisis-btn" onClick={() => onProceso('Rápido')}>
+              <span className="fg-analisis-icono"><Zap size={22} /></span>
+              <span className="fg-analisis-texto">
+                <strong>Rápido</strong>
+                <small>Cómo está tu finca y qué lluvia viene</small>
+              </span>
+              <ChevronRight size={20} />
+            </button>
+            <button className="fg-analisis-btn azul" onClick={() => onProceso('Profundo')}>
+              <span className="fg-analisis-icono"><Layers size={22} /></span>
+              <span className="fg-analisis-texto">
+                <strong>Profundo</strong>
+                <small>Además, qué sembrar en los próximos 4 años</small>
+              </span>
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </section>
+
+        <div className="fg-stats fg-aparecer" style={{ '--retraso': '0.2s' }}>
           <div className="fg-stat">
             <LandPlot size={18} />
-            <span>Superficie</span>
+            <span>Tamaño</span>
             <strong>{formatoNumero(parcela.area)} ha</strong>
           </div>
           <div className="fg-stat">
             <Ruler size={18} />
-            <span>Perímetro</span>
+            <span>Contorno</span>
             <strong>{formatoNumero(parcela.perimetro, 0)} m</strong>
           </div>
-          <div className="fg-stat ancho">
+          <button className="fg-stat ancho fg-stat-boton" onClick={onVerResultados}>
             <Activity size={18} />
             <span>Salud del cultivo</span>
-            <strong className="fg-pendiente">Sin análisis todavía</strong>
-          </div>
+            {analisis?.simulado ? (
+              <strong className="fg-salud">
+                <i className="fg-salud-sim" />
+                Ejemplo simulado · ver resultados
+              </strong>
+            ) : analisis ? (
+              <strong className="fg-salud">
+                <i style={{ background: ESTADOS[analisis.estado].color }} />
+                {MENSAJE_ESTADO[analisis.estado].titulo} · {analisis.puntaje}/100
+              </strong>
+            ) : (
+              <strong className="fg-pendiente">Sin análisis todavía · Toca para analizar</strong>
+            )}
+            <ChevronRight size={18} className="fg-stat-flecha" />
+          </button>
         </div>
-
-        <section className="fg-aparecer" style={{ '--retraso': '0.2s' }}>
-          <h2 className="fg-seccion-titulo">Procesos</h2>
-          <div className="vm-procesos">
-            <button className="vm-proceso" onClick={() => onProceso('Rápido')}>
-              <Zap size={20} /> <span>Rápido</span>
-            </button>
-            <button className="vm-proceso azul" onClick={() => onProceso('Profundo')}>
-              <Layers size={20} /> <span>Profundo</span>
-            </button>
-          </div>
-        </section>
 
         <section className="fg-aparecer" style={{ '--retraso': '0.3s' }}>
           <h2 className="fg-seccion-titulo">Actividad reciente</h2>
@@ -125,8 +153,15 @@ export default function PantallaHome({ nombre, ubicacion, parcela, historial, on
       </div>
 
       <nav className="fg-nav" aria-label="Navegación principal">
-        {NAVEGACION.map(({ nombre: n, Icono }, i) => (
-          <button key={n} className={i === 0 ? 'activo' : ''} aria-current={i === 0 ? 'page' : undefined}>
+        {NAVEGACION.map(({ nombre: n, Icono, listo }, i) => (
+          <button
+            key={n}
+            className={i === 0 ? 'activo' : ''}
+            aria-current={i === 0 ? 'page' : undefined}
+            disabled={!listo}
+            title={listo ? undefined : 'Disponible pronto'}
+            onClick={n === 'Análisis' ? onVerResultados : undefined}
+          >
             <Icono size={22} />
             <span>{n}</span>
           </button>

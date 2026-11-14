@@ -293,7 +293,7 @@
 
 .fg-lectura { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .fg-lectura div { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 12px; background: #f3f4f6; min-width: 0; }
-.fg-lectura span { font-size: 11px; color: var(--onb-texto-suave); text-transform: uppercase; letter-spacing: 0.04em; }
+.fg-lectura span { font-size: 12px; color: var(--onb-texto-suave); text-transform: uppercase; letter-spacing: 0.04em; }
 .fg-lectura strong { font-size: 13px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; }
 .fg-resultado div { background: var(--esmeralda-suave); }
 .fg-resultado strong { color: var(--esmeralda-oscuro); font-family: inherit; font-size: 15px; }
@@ -347,7 +347,7 @@
 .fg-paso-btn:hover { background: #d1fae5; }
 .fg-sugerencias { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
 .fg-chip {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 16px;
   border: 1.5px solid #e5e7eb;
   border-radius: 999px;
@@ -377,6 +377,7 @@
 
 .fg-tarjeta-finca { overflow: hidden; border-radius: 20px; background: #fff; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); }
 .fg-mini-mapa { position: relative; height: 170px; }
+@media (max-height: 700px) { .fg-mini-mapa { height: 128px; } }
 .fg-mini-mapa .map { height: 100%; width: 100%; }
 .fg-insignia {
   position: absolute;
@@ -412,6 +413,12 @@
 .fg-stat span { font-size: 12px; color: var(--onb-texto-suave); }
 .fg-stat strong { font-size: 20px; font-weight: 600; color: #111827; }
 .fg-stat strong.fg-pendiente { font-size: 15px; font-weight: 500; color: var(--onb-texto-suave); }
+.fg-stat-boton { position: relative; border: none; font: inherit; text-align: left; cursor: pointer; }
+.fg-stat-boton:hover { box-shadow: 0 4px 14px rgba(4, 120, 87, 0.12); }
+.fg-stat-flecha { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+.fg-stat strong.fg-salud { display: flex; align-items: center; gap: 8px; padding-right: 24px; font-size: 16px; }
+.fg-salud i { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.fg-salud i.fg-salud-sim { border: 1.5px dashed #9ca3af; background: transparent; }
 .fg-seccion-titulo { margin: 0 0 10px; font-size: 16px; font-weight: 600; }
 .fg-home .vm-item { background: #fff; }
 
@@ -438,6 +445,43 @@
   cursor: pointer;
 }
 .fg-nav button.activo { color: var(--esmeralda); font-weight: 600; }
+.fg-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+.fg-nav button span { font-size: 12px; }
+
+/* Botones de análisis con descripción */
+.fg-analisis { display: flex; flex-direction: column; gap: 10px; }
+.fg-analisis-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--esmeralda);
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.22);
+  transition: transform 0.1s, filter 0.15s;
+}
+.fg-analisis-btn.azul { background: #1d4ed8; box-shadow: 0 6px 16px rgba(29, 78, 216, 0.22); }
+.fg-analisis-btn:hover { filter: brightness(0.94); }
+.fg-analisis-btn:active { transform: scale(0.98); }
+.fg-analisis-btn:focus-visible { outline: 3px solid rgba(4, 120, 87, 0.35); outline-offset: 2px; }
+.fg-analisis-icono {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.fg-analisis-texto { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fg-analisis-texto strong { font-size: 17px; font-weight: 600; }
+.fg-analisis-texto small { font-size: 13.5px; line-height: 1.3; opacity: 0.92; }
 
 @media (prefers-reduced-motion: reduce) {
   .fg-aparecer, .fg-radar-barrido, .fg-radar-anillo, .fg-escaneo, .fg-marcador-pulso,

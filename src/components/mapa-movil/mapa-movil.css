@@ -114,7 +114,7 @@
 .vm-item-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13px; }
 .vm-item-texto strong { color: #111827; }
 .vm-item-texto span { color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vm-item small { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+.vm-item small { font-size: 12px; color: #9ca3af; flex-shrink: 0; }
 
 .vm-procesos-titulo { margin: 14px 0 10px; }
 .vm-procesos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -142,6 +142,46 @@
   outline: 3px solid rgba(4, 120, 87, 0.35);
   outline-offset: 2px;
 }
+
+/* ---------- Dibujo de la finca (modo manual) ---------- */
+.vm-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 26px;
+}
+.vm-paso-titulo { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.25; color: #111827; }
+.vm-paso-texto { margin: -4px 0 2px; font-size: 15px; line-height: 1.45; color: #4b5563; }
+.vm-pasos-lista { margin: -2px 0 4px; padding-left: 22px; font-size: 15px; line-height: 1.5; color: #4b5563; }
+.vm-pasos-lista li + li { margin-top: 4px; }
+.vm-pasos-lista b { color: #111827; }
+.vm-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vm-botones .onb-btn { padding: 0 12px; }
+.vm-panel .onb-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.vm-panel .fg-btn-texto { display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+.vm-guia {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  z-index: 1000;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.82);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+.vm-mapa.dibujando .leaflet-container { cursor: crosshair; }
+/* Control de capas más fácil de tocar */
+.vm-mapa .leaflet-control-layers-toggle { width: 44px; height: 44px; }
 
 @media (prefers-reduced-motion: reduce) {
   .vm-historial, .vm-chevron { transition: none; }

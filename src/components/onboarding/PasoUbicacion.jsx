@@ -16,16 +16,16 @@ export default function PasoUbicacion({ nombre, onVolver, onUseCurrentLocation, 
           <MapIcon size={44} strokeWidth={1.75} />
         </div>
         <p className="onb-saludo">Hola, {nombre.split(' ')[0]}</p>
-        <h1 className="onb-titulo">Ubica tu finca</h1>
-        <p className="onb-subtitulo">Selecciona cómo deseas registrar la ubicación de tu terreno.</p>
+        <h1 className="onb-titulo">¿Dónde está tu finca?</h1>
+        <p className="onb-subtitulo">Si estás ahora en tu finca, usa el GPS del celular. Si no, búscala y dibújala en el mapa.</p>
       </div>
 
       <div className="onb-acciones">
         <button type="button" className="onb-btn onb-btn-primario" onClick={onUseCurrentLocation}>
-          <LocateFixed size={20} /> Ubicación actual
+          <LocateFixed size={20} /> Estoy en mi finca (usar GPS)
         </button>
         <button type="button" className="onb-btn onb-btn-secundario" onClick={onSelectManually}>
-          <MapIcon size={20} /> Seleccionar manualmente
+          <MapIcon size={20} /> Dibujarla en el mapa
         </button>
       </div>
     </div>

@@ -488,3 +488,19 @@
   .fg-check-halo, .fg-chispa, .fg-chip-punto { animation: none !important; }
   .fg-check-circulo, .fg-check-marca, .fg-trazo { animation-duration: 0.01s; }
 }
+
+/* ---------- Ubicar parcela (cuadro arrastrable) ---------- */
+.fg-cuadro { cursor: move; touch-action: none; }
+.fg-asa {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--esmeralda);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  touch-action: none;
+}
+.fg-asa:active { cursor: grabbing; }
+.fg-ubicar.ajustando .fg-asa, .fg-ubicar.listo .fg-asa { opacity: 0.55; }
+.fg-ubicar .fg-cerrar { top: max(14px, env(safe-area-inset-top)); }

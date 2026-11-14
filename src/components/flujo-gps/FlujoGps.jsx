@@ -3,18 +3,18 @@ import { ArrowRight } from 'lucide-react'
 import PantallaLocalizando from './PantallaLocalizando.jsx'
 import PantallaConfirmacion from './PantallaConfirmacion.jsx'
 import PantallaHectareas from './PantallaHectareas.jsx'
-import PantallaProcesando from './PantallaProcesando.jsx'
+import PantallaUbicarParcela from './PantallaUbicarParcela.jsx'
 import PantallaHome from './PantallaHome.jsx'
 import PantallaResultados from '../resultados/PantallaResultados.jsx'
-import { formatoCoord, formatoNumero } from './geo.js'
+import { formatoNumero } from './geo.js'
 import '../onboarding/onboarding.css'
 import '../mapa-movil/mapa-movil.css'
 import './flujo-gps.css'
 
-const PANTALLA = { LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, PROCESANDO: 5, HOME: 6, RESULTADOS: 7 }
+const PANTALLA = { LOCALIZANDO: 1, UBICACION_OK: 2, HECTAREAS: 3, HECTAREAS_OK: 4, UBICAR_PARCELA: 5, HOME: 6, RESULTADOS: 7 }
 
 // Flujo que sigue a "Estoy en mi finca":
-// localizar → confirmar → hectáreas → confirmar → procesar parcela → home → resultados
+// localizar → confirmar → hectáreas → confirmar → ubicar parcela en el mapa → home → resultados
 // Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio.
 export default function FlujoGps({
   nombre, historial, ubicacionInicial = null, parcelaInicial = null, onEvento, onProceso, onCancelar, onManual,
@@ -44,9 +44,15 @@ export default function FlujoGps({
     irA(PANTALLA.HECTAREAS_OK)
   }
 
-  const alTerminarProceso = (resultado) => {
+  const alAceptarParcela = ({ automatico, ...resultado }) => {
     setParcela(resultado)
-    onEvento('Parcela', `Contorno aproximado de ${formatoNumero(resultado.area)} ha`)
+    onEvento(
+      'Parcela',
+      automatico
+        ? `Contorno ajustado al mapa: ${formatoNumero(resultado.area, 1)} ha`
+        : `Ubicada en el mapa: ${formatoNumero(resultado.area, 1)} ha`,
+    )
+    irA(PANTALLA.HOME)
   }
 
   const analizar = (modo) => {
@@ -63,11 +69,7 @@ export default function FlujoGps({
         return (
           <PantallaConfirmacion
             titulo="¡Ubicación obtenida!"
-            mensaje="Guardamos el lugar donde estás ahora, que es tu finca."
-            detalles={[
-              { etiqueta: 'Precisión del GPS', valor: `unos ${Math.round(ubicacion.precision)} metros` },
-              { etiqueta: 'Coordenadas', valor: `${formatoCoord(ubicacion.lat)}, ${formatoCoord(ubicacion.lng)}` },
-            ]}
+            mensaje="Ya sabemos dónde está tu finca."
             textoPrincipal="Continuar"
             iconoPrincipal={<ArrowRight size={20} />}
             onPrincipal={() => irA(PANTALLA.HECTAREAS)}
@@ -95,18 +97,18 @@ export default function FlujoGps({
             ]}
             textoPrincipal="Ubicar mi parcela en el mapa"
             iconoPrincipal={<ArrowRight size={20} />}
-            onPrincipal={() => irA(PANTALLA.PROCESANDO)}
+            onPrincipal={() => irA(PANTALLA.UBICAR_PARCELA)}
             textoSecundario="Editar hectáreas"
             onSecundario={() => irA(PANTALLA.HECTAREAS)}
           />
         )
-      case PANTALLA.PROCESANDO:
+      case PANTALLA.UBICAR_PARCELA:
         return (
-          <PantallaProcesando
+          <PantallaUbicarParcela
             ubicacion={ubicacion}
             hectareas={hectareas}
-            onTerminado={alTerminarProceso}
-            onIrAlInicio={() => irA(PANTALLA.HOME)}
+            onAceptar={alAceptarParcela}
+            onVolver={() => irA(PANTALLA.HECTAREAS_OK)}
           />
         )
       case PANTALLA.RESULTADOS:

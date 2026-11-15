@@ -1,39 +1,29 @@
 import { useMemo } from 'react'
 import { MapContainer, Polygon, TileLayer } from 'react-leaflet'
-import {
-  Activity, BarChart3, ChevronRight, House, Layers, LandPlot, Map as MapIcon, MapPin, Plus, Ruler, ScanLine, UserRound, Zap,
-} from 'lucide-react'
+import { ChevronRight, Layers, MapPin, Plus, ScanLine, Sprout, Zap } from 'lucide-react'
 import L from '../../lib/leaflet.js'
 import { TILE_SATELITE, formatoNumero } from './geo.js'
-import { ESTADOS, MENSAJE_ESTADO } from '../resultados/analisis.js'
-
-const ICONOS = { Rápido: Zap, Profundo: Layers, Ubicación: MapPin, Superficie: Ruler, Parcela: ScanLine }
+import { MENSAJE_ESTADO } from '../resultados/analisis.js'
+import FilaAnalisis from '../ui/FilaAnalisis.jsx'
 
 const saludo = () => {
   const h = new Date().getHours()
   return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
 }
 
-const hora = (fecha) => fecha.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
-
-// `listo: false` = pantalla aún no construida: se muestra apagada para no
-// dejar al agricultor tocando un botón que no hace nada.
-const NAVEGACION = [
-  { nombre: 'Inicio', Icono: House, listo: true },
-  { nombre: 'Mapa', Icono: MapIcon, listo: false },
-  { nombre: 'Análisis', Icono: BarChart3, listo: true },
-  { nombre: 'Perfil', Icono: UserRound, listo: false },
-]
-
-// Home simulada: resumen de la finca recién registrada.
-export default function PantallaHome({
-  nombre, ubicacion, parcelas, historial, analisis, onProceso, onVerResultados, onAgregarParcela,
-}) {
+// Inicio: la finca registrada (una o varias parcelas) y los dos análisis disponibles.
+export default function PantallaHome({ nombre, ubicacion, parcelas, analisis, onProceso, onVerResultados, onAgregarParcela }) {
   const limites = useMemo(() => L.latLngBounds(parcelas.flatMap((p) => p.poligono)), [parcelas])
   const areaTotal = parcelas.reduce((s, p) => s + p.area, 0)
   const varias = parcelas.length > 1
   const primerNombre = nombre.split(' ')[0]
   const porGps = ubicacion.precision != null
+
+  const salud = !analisis
+    ? { texto: 'Sin análisis todavía. Toca para analizar.', nota: undefined }
+    : analisis.simulado
+      ? { texto: 'Mira el ejemplo de cómo se verá', nota: 'Simulado' }
+      : { texto: `${MENSAJE_ESTADO[analisis.estado].titulo} · ${analisis.puntaje}/100`, nota: undefined }
 
   return (
     <div className="fg-pantalla fg-home">
@@ -51,6 +41,7 @@ export default function PantallaHome({
         <article className="fg-tarjeta-finca fg-aparecer">
           <div className="fg-mini-mapa">
             <MapContainer
+              // Al agregar una parcela cambian los límites: se vuelve a encuadrar
               key={parcelas.length}
               bounds={limites}
               boundsOptions={{ padding: [20, 20] }}
@@ -88,7 +79,7 @@ export default function PantallaHome({
                     : 'Ubicada dibujándola en el mapa'}
               </p>
             </div>
-            <button className="fg-btn-anadir" onClick={onAgregarParcela}>
+            <button type="button" className="fg-btn-anadir" onClick={onAgregarParcela}>
               <Plus size={18} /> Añadir parcela
             </button>
           </div>
@@ -116,74 +107,18 @@ export default function PantallaHome({
           </div>
         </section>
 
-        <div className="fg-stats fg-aparecer" style={{ '--retraso': '0.2s' }}>
-          <div className="fg-stat">
-            <LandPlot size={18} />
-            <span>{varias ? 'Tamaño total' : 'Tamaño'}</span>
-            <strong>{formatoNumero(areaTotal)} ha</strong>
-          </div>
-          <div className="fg-stat">
-            {varias ? <ScanLine size={18} /> : <Ruler size={18} />}
-            <span>{varias ? 'Parcelas' : 'Contorno'}</span>
-            <strong>{varias ? parcelas.length : `${formatoNumero(parcelas[0].perimetro, 0)} m`}</strong>
-          </div>
-          <button className="fg-stat ancho fg-stat-boton" onClick={onVerResultados}>
-            <Activity size={18} />
-            <span>Salud del cultivo</span>
-            {analisis?.simulado ? (
-              <strong className="fg-salud">
-                <i className="fg-salud-sim" />
-                Ejemplo simulado · ver resultados
-              </strong>
-            ) : analisis ? (
-              <strong className="fg-salud">
-                <i style={{ background: ESTADOS[analisis.estado].color }} />
-                {MENSAJE_ESTADO[analisis.estado].titulo} · {analisis.puntaje}/100
-              </strong>
-            ) : (
-              <strong className="fg-pendiente">Sin análisis todavía · Toca para analizar</strong>
-            )}
-            <ChevronRight size={18} className="fg-stat-flecha" />
-          </button>
-        </div>
-
-        <section className="fg-aparecer" style={{ '--retraso': '0.3s' }}>
-          <h2 className="fg-seccion-titulo">Actividad reciente</h2>
-          <ul className="vm-lista">
-            {historial.slice(0, 5).map((item) => {
-              const Icono = ICONOS[item.tipo] ?? Activity
-              return (
-                <li key={item.id} className="vm-item">
-                  <span className={`vm-item-icono ${item.tipo === 'Profundo' ? 'azul' : ''}`}>
-                    <Icono size={16} />
-                  </span>
-                  <div className="vm-item-texto">
-                    <strong>{item.tipo}</strong>
-                    <span>{item.detalle}</span>
-                  </div>
-                  <small>{hora(item.fecha)}</small>
-                </li>
-              )
-            })}
-          </ul>
+        <section className="fg-aparecer" style={{ '--retraso': '0.2s' }}>
+          <FilaAnalisis
+            tono="morado"
+            Icono={Sprout}
+            titulo="Salud del cultivo"
+            texto={salud.texto}
+            nota={salud.nota}
+            notaTipo="simulado"
+            onClick={onVerResultados}
+          />
         </section>
       </div>
-
-      <nav className="fg-nav" aria-label="Navegación principal">
-        {NAVEGACION.map(({ nombre: n, Icono, listo }, i) => (
-          <button
-            key={n}
-            className={i === 0 ? 'activo' : ''}
-            aria-current={i === 0 ? 'page' : undefined}
-            disabled={!listo}
-            title={listo ? undefined : 'Disponible pronto'}
-            onClick={n === 'Análisis' ? onVerResultados : undefined}
-          >
-            <Icono size={22} />
-            <span>{n}</span>
-          </button>
-        ))}
-      </nav>
     </div>
   )
 }

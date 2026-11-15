@@ -12,41 +12,25 @@ const ICONO_FOCO = L.divIcon({
   iconAnchor: [28, 28],
 })
 
-const CAPAS = {
-  verdor: {
-    nombre: 'Verdor',
-    pregunta: '¿Qué tan sanas y verdes están tus plantas?',
-    etiquetas: { bien: 'Sano', atencion: 'Algo débil', problema: 'Débil', grave: 'Muy débil' },
-  },
-  humedad: {
-    nombre: 'Agua en el suelo',
-    pregunta: '¿Cuánta agua tiene el suelo en cada zona?',
-    etiquetas: { bien: 'Húmedo', atencion: 'Algo seco', problema: 'Seco', grave: 'Muy seco' },
-  },
+const ETIQUETAS_CAPA = {
+  verdor: { bien: 'Sano', atencion: 'Algo débil', problema: 'Débil', grave: 'Muy débil' },
+  humedad: { bien: 'Húmedo', atencion: 'Algo seco', problema: 'Seco', grave: 'Muy seco' },
 }
 
-export default function MapaSalud({ parcela, zonas, capa, onCapa, resaltar }) {
+// Detalle de una capa (verdor o humedad): mapa grande por zonas y su reparto.
+export default function MapaSalud({ parcela, zonas, capa, resaltar }) {
   const sim = zonas.simulado
   const limites = useMemo(() => L.latLngBounds(parcela.poligono), [parcela])
   const lienzo = useMemo(() => L.canvas({ padding: 0.5 }), [])
   const resumen = zonas[capa]
-  const { etiquetas } = CAPAS[capa]
+  const etiquetas = ETIQUETAS_CAPA[capa]
 
   return (
     <div className="rs-tarjeta rs-mapa-tarjeta">
-      <div className="rs-segmentos" role="tablist" aria-label="Capa del mapa">
-        {Object.entries(CAPAS).map(([id, c]) => (
-          <button key={id} role="tab" aria-selected={capa === id} className={capa === id ? 'activo' : ''} onClick={() => onCapa(id)}>
-            {c.nombre}
-          </button>
-        ))}
-      </div>
-      <p className="rs-pregunta">{CAPAS[capa].pregunta}</p>
-
       <div className="rs-mapa">
         <MapContainer
           bounds={limites}
-          boundsOptions={{ padding: [18, 18] }}
+          boundsOptions={{ padding: [22, 22] }}
           className="map"
           zoomControl={false}
           scrollWheelZoom={false}
@@ -90,17 +74,11 @@ export default function MapaSalud({ parcela, zonas, capa, onCapa, resaltar }) {
           )
         })}
       </ul>
-      {sim ? (
-        <p className="rs-nota rs-nota-sim">
-          Estos colores son un ejemplo inventado para mostrar cómo funcionará el mapa. No describen lo que pasa en tu terreno
-          y no sirven para decidir dónde revisar o regar.
-        </p>
-      ) : resumen.afectadas ? (
+      {/* Con datos reales se indica dónde revisar; con la simulación no se afirma nada. */}
+      {!sim && resumen.afectadas && (
         <p className="rs-nota">
-          Las zonas a revisar están en <strong>{textoZona(resumen.afectadas.zona)}</strong> de tu parcela.
+          Revisa <strong>{textoZona(resumen.afectadas.zona)}</strong> de tu parcela.
         </p>
-      ) : (
-        <p className="rs-nota">Toda la parcela se ve pareja. ¡Bien!</p>
       )}
     </div>
   )

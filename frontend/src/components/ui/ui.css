@@ -1,0 +1,144 @@
+/* ---------- Widget de dato destacado (estilo tarjeta del tiempo) ---------- */
+.ui-widget {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'ilu dato' 'pie pie';
+  gap: 6px 12px;
+  padding: 16px 18px 12px;
+  overflow: hidden;
+  border-radius: 20px;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(15, 40, 80, 0.18);
+}
+.ui-widget.tono-azul { background: linear-gradient(140deg, #173f7d 0%, #2563b8 48%, #6fa6e6 100%); }
+.ui-widget.tono-verde { background: linear-gradient(140deg, #053d2e 0%, #047857 50%, #3fbf8a 100%); }
+/* Brillo suave en la esquina, como el reflejo del widget del tiempo */
+.ui-widget::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 70%;
+  height: 120%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.22), transparent);
+  pointer-events: none;
+}
+.ui-widget-ilustracion { grid-area: ilu; align-self: center; width: 116px; }
+.ui-ilustracion { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0, 20, 60, 0.25)); }
+.ui-widget-dato { grid-area: dato; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-end; text-align: right; min-width: 0; }
+.ui-widget-valor { display: flex; align-items: flex-start; margin: 0; line-height: 1; }
+.ui-widget-valor strong { font-size: 44px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ui-widget-valor sup { margin: 4px 0 0 3px; font-size: 17px; font-weight: 500; opacity: 0.9; }
+.ui-widget-detalle { margin: 6px 0 0; font-size: 14px; line-height: 1.3; opacity: 0.92; }
+.ui-widget-detalle + .ui-widget-detalle { margin-top: 2px; }
+.ui-widget-insignia {
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  font-weight: 600;
+}
+.ui-widget-pie {
+  grid-area: pie;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.ui-widget-pie button {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  margin-right: -8px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ui-widget-pie button:hover { background: rgba(255, 255, 255, 0.12); }
+.ui-widget-pie button:focus-visible { outline: 3px solid rgba(255, 255, 255, 0.6); outline-offset: 1px; }
+
+/* Miniatura del mapa usada como "ilustración" en el widget de la finca */
+.ui-miniatura {
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+.ui-miniatura .map { width: 100%; height: 100%; }
+
+/* ---------- Lista de análisis (estilo "advisory") ---------- */
+.ui-lista { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ui-fila {
+  --tono: #047857;
+  display: grid;
+  grid-template-columns: 78px 1fr 36px;
+  align-items: stretch;
+  width: 100%;
+  min-height: 92px;
+  padding: 0;
+  overflow: hidden;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.ui-fila:hover { border-color: color-mix(in srgb, var(--tono) 45%, #fff); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
+.ui-fila:active { transform: scale(0.99); }
+.ui-fila:focus-visible { outline: 3px solid color-mix(in srgb, var(--tono) 40%, transparent); outline-offset: 2px; }
+.ui-fila.tono-morado { --tono: #5b3fa6; }
+.ui-fila.tono-azul { --tono: #1d4ed8; }
+.ui-fila.tono-turquesa { --tono: #0e7490; }
+.ui-fila.tono-verde { --tono: #047857; }
+.ui-fila-mosaico {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tono) 82%, #fff), var(--tono));
+}
+.ui-fila-mosaico > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+}
+.ui-fila-texto { display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 12px 4px 12px 14px; min-width: 0; }
+.ui-fila-texto strong { font-size: 16px; font-weight: 600; }
+.ui-fila-texto > span { font-size: 14px; line-height: 1.35; color: #374151; }
+.ui-fila-texto small { margin-top: 2px; font-size: 12px; color: #6b7280; }
+.ui-fila-texto small.nota-simulado {
+  align-self: flex-start;
+  padding: 1px 7px;
+  border: 1px dashed #9ca3af;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+.ui-fila-flecha { align-self: center; color: #9ca3af; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-fila { transition: none; }
+}

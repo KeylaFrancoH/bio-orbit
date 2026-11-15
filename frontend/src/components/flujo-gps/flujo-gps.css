@@ -375,6 +375,7 @@
 .fg-home-contenido { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 24px; display: flex; flex-direction: column; gap: 20px; }
 .fg-home-contenido > * { flex-shrink: 0; }
 
+/* Tarjeta "Mi finca": mapa de las parcelas + botón para añadir otra */
 .fg-tarjeta-finca { overflow: hidden; border-radius: 20px; background: #fff; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); }
 .fg-mini-mapa { position: relative; height: 170px; }
 @media (max-height: 700px) { .fg-mini-mapa { height: 128px; } }
@@ -417,55 +418,7 @@
 .fg-tarjeta-finca-info h2 { margin: 0 0 4px; font-size: 17px; font-weight: 600; }
 .fg-tarjeta-finca-info p { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--onb-texto-suave); }
 
-.fg-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fg-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 14px;
-  border-radius: 16px;
-  background: #fff;
-  color: var(--esmeralda);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-}
-.fg-stat.ancho { grid-column: span 2; }
-.fg-stat span { font-size: 12px; color: var(--onb-texto-suave); }
-.fg-stat strong { font-size: 20px; font-weight: 600; color: #111827; }
-.fg-stat strong.fg-pendiente { font-size: 15px; font-weight: 500; color: var(--onb-texto-suave); }
-.fg-stat-boton { position: relative; border: none; font: inherit; text-align: left; cursor: pointer; }
-.fg-stat-boton:hover { box-shadow: 0 4px 14px rgba(4, 120, 87, 0.12); }
-.fg-stat-flecha { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
-.fg-stat strong.fg-salud { display: flex; align-items: center; gap: 8px; padding-right: 24px; font-size: 16px; }
-.fg-salud i { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.fg-salud i.fg-salud-sim { border: 1.5px dashed #9ca3af; background: transparent; }
 .fg-seccion-titulo { margin: 0 0 10px; font-size: 16px; font-weight: 600; }
-.fg-home .vm-item { background: #fff; }
-
-.fg-nav {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 6px 8px max(8px, env(safe-area-inset-bottom));
-  border-top: 1px solid #eceef1;
-  background: #fff;
-}
-.fg-nav button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-height: 52px;
-  justify-content: center;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
-  color: #9ca3af;
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
-}
-.fg-nav button.activo { color: var(--esmeralda); font-weight: 600; }
-.fg-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
-.fg-nav button span { font-size: 12px; }
 
 /* Botones de análisis con descripción */
 .fg-analisis { display: flex; flex-direction: column; gap: 10px; }

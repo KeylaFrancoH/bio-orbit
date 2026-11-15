@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import Onboarding from './components/onboarding/Onboarding.jsx'
 import VistaMapaMovil from './components/mapa-movil/VistaMapaMovil.jsx'
 import FlujoGps from './components/flujo-gps/FlujoGps.jsx'
@@ -7,14 +7,6 @@ export default function App() {
   // null mientras el usuario está en el onboarding
   const [sesion, setSesion] = useState(null)
   const [ultimoNombre, setUltimoNombre] = useState('')
-  const [historial, setHistorial] = useState([])
-
-  const registrar = useCallback((tipo, detalle) => {
-    setHistorial((prev) => [
-      { id: crypto.randomUUID(), tipo, detalle, fecha: new Date() },
-      ...prev,
-    ])
-  }, [])
 
   // La ubicación se obtiene dentro del flujo GPS (pantalla "Detectando tu ubicación")
   const onUseCurrentLocation = ({ nombre }) => {
@@ -53,7 +45,6 @@ export default function App() {
       <VistaMapaMovil
         sesion={sesion}
         onVolver={volverAlOnboarding}
-        onEvento={registrar}
         onParcelaLista={onParcelaLista}
       />
     )
@@ -63,11 +54,8 @@ export default function App() {
   return (
     <FlujoGps
       nombre={sesion.nombre}
-      historial={historial}
       ubicacionInicial={sesion.ubicacion}
       parcelaInicial={sesion.parcela}
-      onEvento={registrar}
-      onProceso={registrar}
       onCancelar={volverAlOnboarding}
       onManual={() => onSelectManually({ nombre: sesion.nombre })}
     />

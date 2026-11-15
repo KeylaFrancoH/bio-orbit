@@ -36,7 +36,7 @@ const ESTILO = { color: '#ffffff', weight: 3, fillColor: '#10b981', fillOpacity:
 
 // Modo manual: el agricultor busca su finca y la dibuja tocando sus esquinas.
 // Al guardar, sigue el mismo camino que el flujo GPS (inicio → resultados).
-export default function VistaMapaMovil({ sesion, onVolver, onEvento, onParcelaLista }) {
+export default function VistaMapaMovil({ sesion, onVolver, onParcelaLista }) {
   const [estado, setEstado] = useState('explorar') // explorar | dibujando | listo
   const [puntos, setPuntos] = useState([])
   const primerNombre = sesion.nombre.split(' ')[0]
@@ -52,7 +52,6 @@ export default function VistaMapaMovil({ sesion, onVolver, onEvento, onParcelaLi
   const guardar = () => {
     const centro = puntos.reduce((acc, [lat, lng]) => [acc[0] + lat / puntos.length, acc[1] + lng / puntos.length], [0, 0])
     const parcela = { poligono: puntos, area, perimetro: perimetroM(puntos) }
-    onEvento?.('Parcela', `Dibujada en el mapa: ${hectareas(area)} ha`)
     onParcelaLista({ ubicacion: { lat: centro[0], lng: centro[1], precision: null }, parcela })
   }
 

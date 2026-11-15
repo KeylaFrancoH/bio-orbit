@@ -20,7 +20,7 @@ const PANTALLA = {
 // Las pantallas ✓ e informativas avanzan solas.
 // Si la finca ya viene dibujada a mano (`parcelaInicial`), empieza en el inicio.
 export default function FlujoGps({
-  nombre, historial, ubicacionInicial = null, parcelaInicial = null, onEvento, onProceso, onCancelar, onManual,
+  nombre, ubicacionInicial = null, parcelaInicial = null, onCancelar, onManual,
 }) {
   const [pantalla, setPantalla] = useState(parcelaInicial ? PANTALLA.HOME : PANTALLA.LOCALIZANDO)
   const [direccion, setDireccion] = useState('adelante')
@@ -41,26 +41,18 @@ export default function FlujoGps({
 
   const alUbicar = (u) => {
     setUbicacion(u)
-    onEvento('Ubicación', `Encontrada con GPS (±${Math.round(u.precision)} m)`)
     irA(PANTALLA.UBICACION_OK)
   }
 
   const alGuardarHectareas = (ha) => {
     setHectareas(ha)
-    onEvento('Superficie', `${formatoNumero(ha)} ha declaradas`)
     irA(PANTALLA.HECTAREAS_OK)
   }
 
   // `otra`: el usuario eligió "Guardar y agregar otra parcela"
-  const alAceptarParcela = ({ automatico, ...resultado }, { otra = false } = {}) => {
-    const tamano = `${formatoNumero(resultado.area, 1)} ha`
-    if (agregando) {
-      setParcelas((prev) => [...prev, resultado])
-      onEvento('Parcela', `Nueva parcela agregada: ${tamano}`)
-    } else {
-      setParcelas([resultado])
-      onEvento('Parcela', automatico ? `Contorno ajustado al mapa: ${tamano}` : `Ubicada en el mapa: ${tamano}`)
-    }
+  // (`automatico` solo indica si se ajustó a los bordes; no se guarda en la parcela)
+  const alAceptarParcela = ({ automatico: _automatico, ...resultado }, { otra = false } = {}) => {
+    setParcelas((prev) => (agregando ? [...prev, resultado] : [resultado]))
     if (otra) {
       setAgregando(true)
       setHaNueva(null)
@@ -85,7 +77,6 @@ export default function FlujoGps({
 
   const analizar = (modo) => {
     setModoAnalisis(modo)
-    onProceso(modo, modo === 'Profundo' ? 'Plan de siembra para 4 años' : 'Revisión de tu finca y la lluvia')
     irA(PANTALLA.RESULTADOS)
   }
 
@@ -160,10 +151,7 @@ export default function FlujoGps({
             parcela={parcela}
             modo={modoAnalisis}
             onVolver={() => irA(PANTALLA.HOME)}
-            onProfundo={() => {
-              setModoAnalisis('Profundo')
-              onProceso('Profundo', 'Plan de siembra para 4 años')
-            }}
+            onProfundo={() => setModoAnalisis('Profundo')}
             onAnalisis={setAnalisis}
           />
         )
@@ -173,7 +161,6 @@ export default function FlujoGps({
             nombre={nombre}
             ubicacion={ubicacion}
             parcelas={parcelas}
-            historial={historial}
             analisis={analisis}
             onProceso={analizar}
             onAgregarParcela={empezarNuevaParcela}
